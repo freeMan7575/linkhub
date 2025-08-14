@@ -18,7 +18,6 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 5;
 
-  // --- [상태 분리!] ---
   // [생성(Create)을 위한 state]
   const [name, setName] = useState('');
   const [channel, setChannel] = useState('');
@@ -53,7 +52,7 @@ export default function Home() {
       if (response.ok) {
         await fetchUsers();
         setName(''); setChannel(''); setTags(''); setJob(''); setAge('');
-        setCurrentPage(1); // 새 사용자 추가 후 1페이지로 이동
+        setCurrentPage(1);
       } else {
         const errorText = await response.text();
         if (errorText.toLowerCase().includes("duplicate key")) {
@@ -113,7 +112,7 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center p-12 sm:p-24 bg-gray-50 dark:bg-black">
-      {/* 사용자 추가 폼 */}
+      {/* ⭐ --- [오늘 복구된 부분!] 사용자 추가 폼 --- ⭐ */}
       <div className="w-full max-w-2xl mb-8">
         <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 space-y-4">
           <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100">새 사용자 추가</h2>
@@ -143,6 +142,7 @@ export default function Home() {
           <button type="submit" className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md shadow-md">추가하기</button>
         </form>
       </div>
+      {/* ⭐ --- 여기까지 --- ⭐ */}
 
       {/* 사용자 목록 */}
       <h1 className="text-4xl font-bold mb-8 text-gray-800 dark:text-gray-100">사용자 목록</h1>
@@ -156,13 +156,7 @@ export default function Home() {
                 {editingUser && editingUser._id === user._id ? (
                   // [수정 모드 UI]
                   <form onSubmit={handleUpdateUser} className="space-y-3">
-                    <input type="text" value={editingUser.name} onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })} required className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600" />
-                    <input type="url" value={editingUser.channel} onChange={(e) => setEditingUser({ ...editingUser, channel: e.target.value })} required className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600" />
-                    <input type="text" placeholder="태그 (쉼표로 구분)" value={Array.isArray(editingUser.tags) ? editingUser.tags.join(', ') : ''} onChange={(e) => setEditingUser({ ...editingUser, tags: e.target.value.split(',').map(t => t.trim()) })} className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600" />
-                    <div className="flex gap-2 justify-end">
-                      <button type="submit" className="bg-green-500 text-white text-sm py-1 px-3 rounded-md hover:bg-green-600">저장</button>
-                      <button type="button" onClick={() => setEditingUser(null)} className="bg-gray-500 text-white text-sm py-1 px-3 rounded-md hover:bg-gray-600">취소</button>
-                    </div>
+                     {/* ... 수정 폼 UI ... */}
                   </form>
                 ) : (
                   // [일반 모드 UI]
@@ -173,8 +167,10 @@ export default function Home() {
                         ) : (
                             <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-center text-xs text-gray-500">No Img</div>
                         )}
-                        <div className="flex-1">
+                        <div>
                             <p className="font-semibold text-lg text-gray-800 dark:text-gray-100">{user.name}</p>
+                            {user.job && <p className="text-sm text-green-600">직업: {user.job}</p>}
+                            {user.age && <p className="text-sm text-purple-500">나이: {user.age}</p>}
                             <a href={user.channel} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-500 hover:underline block truncate max-w-[150px] sm:max-w-xs">{user.channel}</a>
                             <div className="flex flex-wrap gap-1 mt-1">
                                 {user.tags?.map((tag, index) => (
@@ -201,7 +197,11 @@ export default function Home() {
           <button
             key={i + 1}
             onClick={() => paginate(i + 1)}
-            className={`mx-1 px-4 py-2 rounded-md transition-colors ${currentPage === i + 1 ? 'bg-blue-600 text-white' : 'bg-white text-blue-600 border border-blue-600 hover:bg-blue-100 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600'}`}
+            className={`mx-2 px-4 py-2 rounded-md shadow-sm transition-colors ${
+              currentPage === i + 1 
+              ? 'bg-blue-600 text-white font-bold' 
+              : 'bg-white text-blue-600 border border-blue-600 hover:bg-blue-100 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600'
+            }`}
           >
             {i + 1}
           </button>
